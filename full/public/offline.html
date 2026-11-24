@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Jsi offline · Classmate</title>
+<style>
+  :root { color-scheme: light dark; --bg: light-dark(#f4f2ee, #0f1013); --surface: light-dark(#fff, #181a1e); --text: light-dark(#16181b, #f1f2f4); --muted: light-dark(#6b6f76, #8d939c); --accent: light-dark(#0e7c56, #4ae0a0); --border: light-dark(rgba(0,0,0,.12), rgba(255,255,255,.14)); }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { width: min(440px, 100%); text-align: center; padding: 40px 28px; border-radius: 32px; background: var(--surface); border: 1px solid var(--border); }
+  .logo { font-weight: 800; font-size: 40px; letter-spacing: -0.05em; }
+  svg { width: 56px; height: 56px; margin: 18px auto 6px; color: var(--accent); }
+  h1 { font-size: 24px; letter-spacing: -0.03em; margin: 8px 0; }
+  p { color: var(--muted); margin: 0 0 24px; }
+  button { height: 48px; padding: 0 28px; border-radius: 999px; border: 0; background: light-dark(#15181b, #eeeff1); color: light-dark(#fff, #14161a); font: 600 16px inherit; cursor: pointer; }
+</style>
+</head>
+<body>
+<main>
+  <div class="logo">Classmate</div>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8.8a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 20h.01M3 3l18 18"/></svg>
+  <h1>Jsi offline</h1>
+  <p>Tuhle stránku jsi ještě neotevřel a bez připojení ji nemám odkud vzít. Stránky, které jsi už viděl, ti půjdou otevřít i bez internetu.</p>
+  <button onclick="location.reload()">Zkusit znovu</button>
+</main>
+<script>addEventListener("online", () => location.reload());</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "classmate-lite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Classmate lite: jen Bakaláři (rozvrh, suplování, známky, absence, Komens) a Strava.cz pro jednoho člověka, s widgety pro nový Classmate.",
+  "scripts": {
+    "dev": "next dev -p 3100",
+    "build": "next build",
+    "start": "next start -p 3100",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "next": "^15.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": { "node": ">=22" }
+}

@@ -1,0 +1,29 @@
+# Classmate lite: cp .env.example .env, vyplň PUBLIC_URL a APP_SECRET, pak docker compose up -d --build
+# Ven ideálně přes Cloudflare Tunnel nebo reverzní proxy s HTTPS (port 3100 neotvírej přímo do internetu).
+name: classmate-lite
+services:
+  app:
+    image: classmate-selfhost-lite:latest
+    build: .
+    restart: unless-stopped
+    environment:
+      APP_SECRET: ${APP_SECRET:?Nastav APP_SECRET v .env (openssl rand -base64 48)}
+      PUBLIC_URL: ${PUBLIC_URL:-}
+      EMBED_ORIGINS: ${EMBED_ORIGINS:-}
+      SETUP_TOKEN: ${SETUP_TOKEN:-}
+      SYNC_MINUTES: ${SYNC_MINUTES:-15}
+      NTFY_URL: ${NTFY_URL:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      DATA_DIR: /data
+    volumes:
+      - classmate-lite-data:/data
+    ports:
+      - "127.0.0.1:3100:3100"
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  classmate-lite-data:

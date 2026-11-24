@@ -1,0 +1,11 @@
+node_modules
+.next
+/data
+.env*
+!.env*.example
+next-env.d.ts
+tsconfig.tsbuildinfo
+/public/excalidraw
+.deployed
+
+.DS_Store

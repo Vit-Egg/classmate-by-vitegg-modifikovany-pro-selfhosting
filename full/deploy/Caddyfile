@@ -1,0 +1,5 @@
+{$DOMAIN} {
+	encode zstd gzip
+	# Caddy nedůvěřuje příchozímu X-Forwarded-For a přepíše ho skutečnou IP klienta (rate limit na ní stojí).
+	reverse_proxy app:3000
+}
