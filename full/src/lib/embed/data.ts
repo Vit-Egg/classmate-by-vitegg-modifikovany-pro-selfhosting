@@ -8,7 +8,7 @@ import { stravaAccount, stravaMenu, isLunch } from "../strava";
 import { USER_SELECT, type User } from "../session";
 import { absenceHours, type Timetable } from "../types";
 import type { KomensMessage } from "../komens";
-import type { EDay, RenderInput } from "./core";
+import type { EDay, RenderInput } from "./types";
 
 /** Verze pro jednoho člověka: widgety patří vlastníkovi serveru (první správce). */
 export const owner = () => get<User>(`${USER_SELECT} WHERE u.role = 'admin' AND u.demo = 0 ORDER BY u.id LIMIT 1`) ?? null;
@@ -33,7 +33,7 @@ function schoolDays(user: User, today: string, count: number): EDay[] {
     out.push({
       date,
       note: tt.days.find((d) => d.day === dow)?.description || undefined,
-      lessons: slots.map((s) => ({ hour: s.hour, subject: s.subject, begin: fmtMin(s.begin), end: fmtMin(s.end), room: s.room, teacher: s.teacher, cancelled: s.cancelled, change: s.change ?? null })),
+      lessons: slots.map((s) => ({ hour: s.hour, subject: s.subject, hue: s.hue, begin: fmtMin(s.begin), end: fmtMin(s.end), room: s.room, teacher: s.teacher, cancelled: s.cancelled, change: s.change ?? null })),
     });
   }
   return out;
@@ -82,9 +82,9 @@ export async function widgetData(id: string): Promise<RenderInput | null> {
       }
     }
     case "ukoly":
-      return { id, tasks: listTasks(user.id, user.class_id, false).map((t) => ({ title: t.title, subject: t.subject_name ?? undefined, due: t.due_date })), today };
+      return { id, tasks: listTasks(user.id, user.class_id, false).map((t) => ({ title: t.title, subject: t.subject_name ?? undefined, due: t.due_date, hue: t.hue ?? undefined })), today };
     case "testy":
-      return { id, tests: listTests(user.id, user.class_id, today, addDays(today, 30)).map((t) => ({ subject: t.subject_name, topic: t.topic ?? undefined, date: t.date })), today };
+      return { id, tests: listTests(user.id, user.class_id, today, addDays(today, 30)).map((t) => ({ subject: t.subject_name, topic: t.topic ?? undefined, date: t.date, hue: t.hue ?? undefined })), today };
   }
   return null;
 }

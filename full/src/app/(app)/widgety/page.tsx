@@ -19,40 +19,38 @@ export default async function WidgetsPage() {
       <div className="page-head">
         <div>
           <h1 className="title">Widgety</h1>
-          <p className="subtitle">Vlož si rozvrh, známky, obědy a další do nového Classmate nebo jiného dashboardu.</p>
+          <p className="subtitle">Propoj tenhle server s novým Classmate: stránky do menu, widgety na Dnes a rozvržení jako ve starém Classmate.</p>
         </div>
       </div>
 
-      <section style={{ marginBottom: 28 }}>
-        <h2 className="group-title">Plugin pro Classmate</h2>
-        <div className="card card-pad stack" style={{ maxWidth: 760 }}>
-          <p style={{ margin: 0 }}>V novém Classmate otevři <b>Nastavení → Pluginy → Přidat plugin z adresy</b> a vlož tuhle adresu. Nabídne ti rozvržení „Klasický Classmate“.</p>
-          <CopyField value={`${base}/embed/widgets.json?k=${k}`} />
-          <p className="hint" style={{ margin: 0 }}>
-            Vložit widgety smí: {origins.length ? origins.join(", ") : <b>nikdo (doplň EMBED_ORIGINS v .env, např. https://classmate.cz)</b>}.
-            {base.startsWith("http://localhost") && <> Nastav také <code>PUBLIC_URL</code>, jinak adresy ukazují na localhost.</>}
-          </p>
-          <p className="hint" style={{ margin: 0 }}>Propojení bez kopírování: Classmate může otevřít <code>{base}/classmate/connect?origin=…</code>.</p>
-          <form action={rotateWidgetKey}><ConfirmButton message="Vytvořit nový klíč? Všechny vložené widgety a přidaný plugin přestanou fungovat, dokud je nepřidáš znovu.">Vyměnit klíč</ConfirmButton></form>
-        </div>
-      </section>
+      <div className="masonry">
+        <section>
+          <h2 className="section" style={{ marginBottom: 12 }}>Propojení s Classmate</h2>
+          <div className="card card-pad stack">
+            <p style={{ margin: 0 }}>V novém Classmate otevři <b>Nastavení → Pluginy → Přidat web</b> a vlož adresu tohoto serveru:</p>
+            <CopyField value={base} />
+            <p className="hint" style={{ margin: 0 }}>Classmate si sám najde stránky (Rozvrh, Známky, Absence, Komens, Obědy, Úkoly, Testy, Poznámky, Studium), widgety a rozvržení „Klasický Classmate“. Žádné klíče se nekopírují: když bude potřeba, Classmate ukáže tlačítko a otevře okno s přihlášením.</p>
+            <p className="hint" style={{ margin: 0 }}>
+              Vložit tenhle server smí: {origins.length ? origins.join(", ") : <b>jen on sám. Doplň adresu nového Classmate do EMBED_ORIGINS v .env, třeba https://classmate.cz</b>}
+              {base.startsWith("http://localhost") && <> · nastav <code>PUBLIC_URL</code>, jinak adresa ukazuje na localhost</>}
+            </p>
+          </div>
+        </section>
 
-      <section>
-        <h2 className="group-title">Jednotlivé widgety</h2>
-        <div className="auto-cols">
-          {widgets.map((w) => {
-            const src = `${base}/embed/${w.id}?k=${k}`;
-            return (
-              <div key={w.id} className="card card-pad stack">
+        <section>
+          <h2 className="section" style={{ marginBottom: 12 }}>Widgety s klíčem (záloha)</h2>
+          <div className="card rows">
+            {widgets.map((w) => (
+              <div key={w.id} className="kv" style={{ display: "block" }}>
                 <strong>{w.title}</strong>
-                <iframe src={`/embed/${w.id}?k=${k}`} title={w.title} style={{ width: "100%", height: w.height, border: 0, borderRadius: 10 }} sandbox="" loading="lazy" />
-                <CopyField value={src} />
+                <div style={{ marginTop: 8 }}><CopyField value={`${base}/embed/${w.id}?k=${k}`} /></div>
               </div>
-            );
-          })}
-        </div>
-        <p className="hint" style={{ margin: "10px 4px 0" }}>Vzhled: přidej <code>&amp;theme=light</code> nebo <code>&amp;theme=dark</code>, průhledné pozadí <code>&amp;bg=transparent</code>.</p>
-      </section>
+            ))}
+          </div>
+          <p className="hint" style={{ margin: "10px 4px 0" }}>Pro jiné dashboardy nebo staré prohlížeče bez dělených cookies. Adresa obsahuje tajný klíč jen pro čtení widgetů.</p>
+          <form action={rotateWidgetKey} style={{ marginTop: 10 }}><ConfirmButton message="Vytvořit nový klíč? Widgety vložené přes adresu s klíčem přestanou fungovat.">Vyměnit klíč</ConfirmButton></form>
+        </section>
+      </div>
     </div>
   );
 }

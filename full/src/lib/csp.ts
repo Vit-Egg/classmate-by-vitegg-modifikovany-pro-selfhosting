@@ -1,5 +1,5 @@
 /** Content-Security-Policy aplikace. `analytics` je adresa vlastní statistiky (Umami), kterou je potřeba povolit pro skript i odesílání dat. */
-export function buildCsp(analytics?: string) {
+export function buildCsp(analytics?: string, frameAncestors = "'none'") {
   const a = analytics ? ` ${analytics}` : "";
   return [
     "default-src 'self'",
@@ -10,7 +10,7 @@ export function buildCsp(analytics?: string) {
     "media-src 'self' blob:",
     `connect-src 'self' data: blob:${a}`,
     "worker-src 'self' blob:",
-    "frame-ancestors 'none'",
+    `frame-ancestors ${frameAncestors}`,
     "base-uri 'self'",
     "form-action 'self'",
     "object-src 'none'",

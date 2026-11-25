@@ -29,11 +29,19 @@ export const tokenOk = (t: string) => {
 
 const secure = () => process.env.COOKIE_SECURE !== "false" && process.env.NODE_ENV === "production";
 
-export async function createSession() {
+/** Nová relace v databázi; vrací token pro cookie. */
+export function newSession() {
   const t = randomToken(32);
   run("DELETE FROM sessions WHERE expires_at < ?", Date.now());
   run("INSERT INTO sessions (id, expires_at) VALUES (?, ?)", sha256(t), Date.now() + DAYS * 86_400_000);
-  (await cookies()).set(COOKIE, t, { httpOnly: true, sameSite: "lax", path: "/", maxAge: DAYS * 86_400, secure: secure() });
+  return t;
+}
+
+export const SESSION_COOKIE = COOKIE;
+export const SESSION_DAYS = DAYS;
+
+export async function createSession() {
+  (await cookies()).set(COOKIE, newSession(), { httpOnly: true, sameSite: "lax", path: "/", maxAge: DAYS * 86_400, secure: secure() });
 }
 
 export async function loggedIn() {

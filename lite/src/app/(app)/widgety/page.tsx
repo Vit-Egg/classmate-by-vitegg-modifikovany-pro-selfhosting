@@ -1,7 +1,7 @@
 import { rotateKeyAction } from "../../actions";
 import { ALL_WIDGETS, embedKey, embedOrigins, publicBase } from "@/lib/embed/core";
 import { LITE_WIDGETS } from "@/lib/widgets";
-import { Flash, type SP } from "../ui";
+import { Flash, Head, type SP } from "../ui";
 import { Copy } from "./Copy";
 
 export const metadata = { title: "Widgety" };
@@ -12,46 +12,45 @@ export default async function WidgetsPage({ searchParams }: { searchParams: SP }
   const k = encodeURIComponent(embedKey());
   const origins = embedOrigins();
   return (
-    <>
-      <h1>Widgety</h1>
-      <p className="sub">Vlož si rozvrh, známky, Komens a obědy do Classmate nebo jiného dashboardu.</p>
+    <div className="wide">
+      <Head title="Widgety" sub="Propoj tenhle server s Classmate: stránky do menu, widgety na Dnes a rozvržení jako ve starém Classmate." />
       <Flash sp={sp} />
-
-      <h2>Plugin pro Classmate</h2>
-      <div className="card stack">
-        <p style={{ margin: 0 }}>V Classmate otevři <b>Nastavení → Pluginy → Přidat plugin z adresy</b> a vlož tuhle adresu. Nabídne rozvržení „Klasický Classmate“.</p>
-        <Copy value={`${base}/embed/widgets.json?k=${k}`} />
-        <p className="hint" style={{ margin: 0 }}>
-          Vložit widgety smí: {origins.length ? origins.join(", ") : <b>jen tento server (doplň EMBED_ORIGINS v .env, např. https://classmate.cz)</b>}
-          {base.startsWith("http://localhost") && <> · nastav <code>PUBLIC_URL</code>, jinak adresy ukazují na localhost</>}
-        </p>
-      </div>
-
-      <h2>Kalendář (ICS)</h2>
-      <div className="card stack">
-        <p style={{ margin: 0 }}>Rozvrh tohoto a příštího týdne se suplováním. Vlož do Classmate (Nastavení → Můj kalendář), Google nebo Apple kalendáře.</p>
-        <Copy value={`${base}/kalendar.ics?k=${k}`} />
-      </div>
-
-      <h2>Jednotlivé widgety</h2>
-      <div className="grid">
-        {ALL_WIDGETS.filter((w) => LITE_WIDGETS.includes(w.id)).map((w) => (
-          <div key={w.id} className="card stack">
-            <b>{w.title}</b>
-            <iframe src={`/embed/${w.id}?k=${k}`} title={w.title} height={w.height} loading="lazy" sandbox="" style={{ border: "1px solid var(--line)" }} />
-            <Copy value={`${base}/embed/${w.id}?k=${k}`} />
+      <div className="masonry">
+        <section>
+          <h2 className="section" style={{ marginBottom: 12 }}>Propojení s Classmate</h2>
+          <div className="card card-pad stack">
+            <p style={{ margin: 0 }}>V Classmate otevři <b>Nastavení → Pluginy → Přidat web</b> a vlož adresu tohoto serveru:</p>
+            <Copy value={base} />
+            <p className="hint" style={{ margin: 0 }}>Classmate si sám najde, co tenhle server nabízí (stránky Rozvrh, Známky, Absence, Komens a Obědy, widgety a rozvržení „Klasický Classmate“). Žádné tajné klíče se nekopírují: když bude potřeba, Classmate ukáže tlačítko a otevře okno s přihlášením.</p>
+            <p className="hint" style={{ margin: 0 }}>
+              Vložit tenhle server smí: {origins.length ? origins.join(", ") : <b>jen on sám. Doplň adresu svého Classmate do EMBED_ORIGINS v .env, třeba https://classmate.cz</b>}
+              {base.startsWith("http://localhost") && <> · nastav <code>PUBLIC_URL</code>, jinak adresa ukazuje na localhost</>}
+            </p>
           </div>
-        ))}
-      </div>
-      <p className="hint">Vzhled: přidej <code>&amp;theme=light</code> nebo <code>&amp;theme=dark</code>, průhledné pozadí <code>&amp;bg=transparent</code>.</p>
+        </section>
 
-      <h2>Klíč</h2>
-      <div className="card">
-        <form action={rotateKeyAction} className="row">
-          <span className="hint">Adresy obsahují tajný klíč jen pro čtení widgetů. Když unikne, vyměň ho.</span>
-          <button className="btn danger small">Vyměnit klíč</button>
-        </form>
+        <section>
+          <h2 className="section" style={{ marginBottom: 12 }}>Kalendář (ICS)</h2>
+          <div className="card card-pad stack">
+            <p style={{ margin: 0 }}>Rozvrh tohoto a příštího týdne se suplováním, třeba pro Classmate (Nastavení → Můj kalendář), Google nebo Apple kalendář.</p>
+            <Copy value={`${base}/kalendar.ics?k=${k}`} />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="section" style={{ marginBottom: 12 }}>Widgety s klíčem (záloha)</h2>
+          <div className="card rows">
+            {ALL_WIDGETS.filter((w) => LITE_WIDGETS.includes(w.id)).map((w) => (
+              <div key={w.id} className="kv" style={{ display: "block" }}>
+                <strong>{w.title}</strong>
+                <div style={{ marginTop: 8 }}><Copy value={`${base}/embed/${w.id}?k=${k}`} /></div>
+              </div>
+            ))}
+          </div>
+          <p className="hint" style={{ margin: "10px 4px 0" }}>Pro jiné dashboardy nebo staré prohlížeče bez dělených cookies. Adresa obsahuje tajný klíč jen pro čtení widgetů a kalendáře.</p>
+          <form action={rotateKeyAction} style={{ marginTop: 10 }}><button className="btn small danger">Vyměnit klíč</button></form>
+        </section>
       </div>
-    </>
+    </div>
   );
 }

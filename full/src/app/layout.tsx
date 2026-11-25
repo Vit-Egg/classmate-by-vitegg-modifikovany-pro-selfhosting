@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import "./globals.css";
+import "@/lib/embed/cm.css";
+import { CM_FRAME_SCRIPT } from "@/lib/embed/core";
 import { PwaClient } from "@/components/PwaClient";
 import { siteUrl } from "@/lib/site";
 import { SelectEnhancer } from "@/components/SelectEnhancer";
@@ -45,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="cs" className={`${display.variable} ${body.variable}`} suppressHydrationWarning>
       <head>
         <style dangerouslySetInnerHTML={{ __html: accentCss() }} />
-        <script dangerouslySetInnerHTML={{ __html: themeInit + seasonInit }} />
+        <script dangerouslySetInnerHTML={{ __html: themeInit + seasonInit + CM_FRAME_SCRIPT }} />
       </head>
       <body>
         {children}

@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
-const csp = ["default-src 'self'", "script-src 'self' 'unsafe-inline'", "style-src 'self' 'unsafe-inline'", "img-src 'self' data:", "frame-src 'self'", "frame-ancestors 'none'", "base-uri 'self'", "form-action 'self'", "object-src 'none'"].join("; ");
-
+/** Bezpečnostní hlavičky pro vkládání (frame-ancestors, CSP) skládá za běhu src/middleware.ts podle EMBED_ORIGINS. */
 const config: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
@@ -9,17 +8,13 @@ const config: NextConfig = {
   async headers() {
     return [
       {
-        // widgety (/embed), kalendář a propojení si hlavičky nastavují samy
-        source: "/((?!embed/|classmate/connect|kalendar.ics).*)",
+        source: "/:path*",
         headers: [
-          { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "same-origin" },
-          // v dev režimu Next potřebuje eval, CSP proto jen v produkci
-          ...(process.env.NODE_ENV === "production" ? [{ key: "Content-Security-Policy", value: csp }] : []),
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
         ],
       },
-      { source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
     ];
   },
 };

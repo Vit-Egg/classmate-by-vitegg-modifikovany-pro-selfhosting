@@ -1,60 +1,89 @@
 import { marks } from "@/lib/bk";
-import { Flash, SyncButton, type SP } from "../ui";
+import { dayShort, dowOf, fmtShort } from "@/lib/dates";
+import type { Mark } from "@/lib/types";
+import { hueFor } from "@/lib/widgets";
+import { Flash, Head, SyncButton, type SP } from "../ui";
 
 export const metadata = { title: "Známky" };
 
-const d = (iso: string) => `${Number(iso.slice(8, 10))}. ${Number(iso.slice(5, 7))}.`;
+const gradeClass = (m: Mark) => (m.value == null ? "" : ` g${Math.min(5, Math.max(1, Math.round(m.value + 0.01)))}`);
+const tempGrade = (t: string) => {
+  const n = Number(t.replace(",", ".").replace(/[^\d.]/g, ""));
+  return Number.isFinite(n) && n >= 1 && n <= 5 ? ` g${Math.round(n)}` : "";
+};
+const when = (iso: string) => (iso ? `${dayShort(dowOf(iso))} ${fmtShort(iso)}` : "");
+
+function MarkRow({ m, chip }: { m: Mark; chip?: string }) {
+  return (
+    <div className="mark-row">
+      <div className={`mark${gradeClass(m)}`}>{m.text || "–"}{m.isNew && <i className="new-dot" title="Nová známka" />}</div>
+      <div>
+        <div className="t">{m.caption || m.theme}</div>
+        <div className="m">
+          {chip && <span className="chip" style={{ ["--hue" as string]: `var(--h-${chip})` }}>{m.subject}</span>}
+          <span>{when(m.date)}</span>
+          <span>váha {m.weight}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default async function MarksPage({ searchParams }: { searchParams: SP }) {
   const sp = await searchParams;
   const data = await marks();
   const subjects = (data?.subjects ?? []).filter((s) => s.marks.length || s.temporary);
+  const latest = subjects.flatMap((s) => s.marks).sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id)).slice(0, 8);
   return (
-    <>
-      <div className="head">
-        <div>
-          <h1>Známky</h1>
-          <p className="sub">Průměry počítají Bakaláři, nové známky jsou orámované</p>
-        </div>
+    <div className="wide">
+      <Head title="Známky" sub="Tvoje známky a průměry">
         <SyncButton back="/znamky" />
-      </div>
+      </Head>
       <Flash sp={sp} />
       {!data ? (
-        <div className="card">Známky zatím nejsou načtené.</div>
+        <div className="empty">Známky zatím nejsou načtené.</div>
       ) : !subjects.length ? (
-        <div className="card">Zatím žádné známky.</div>
+        <div className="empty">Zatím žádné známky.</div>
       ) : (
-        <div className="card">
-          <table>
-            <thead>
-              <tr>
-                <th>Předmět</th>
-                <th style={{ width: 90 }}>Průměr</th>
-                <th>Známky</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subjects.map((s) => (
-                <tr key={s.id}>
-                  <td>
-                    <b>{s.name}</b>
-                    {s.temporary && <div className="hint">Předběžná: {s.temporary}{s.temporaryNote ? ` · ${s.temporaryNote}` : ""}</div>}
-                  </td>
-                  <td className={Number(s.averageText.replace(",", ".")) >= 3.5 ? "bad" : undefined} style={{ fontSize: 18, fontWeight: 700 }}>{s.averageText || "–"}</td>
-                  <td>
-                    {[...s.marks].sort((a, b) => b.date.localeCompare(a.date)).map((m) => (
-                      <span key={m.id} className={`mark${m.isNew ? " new" : ""}`} title={[m.caption, m.theme, `váha ${m.weight}`, d(m.date)].filter(Boolean).join(" · ")}>
-                        <b>{m.text || (m.value ?? "")}</b>
-                        <small>{d(m.date)}{m.weight && m.weight !== 1 ? ` · ${m.weight}×` : ""}</small>
-                      </span>
-                    ))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="stack-lg">
+          <section>
+            <h2 className="section" style={{ marginBottom: 12, padding: "0 4px" }}>Poslední známky</h2>
+            <div className="card rows">{latest.map((m) => <MarkRow key={m.id} m={m} chip={hueFor(m.subject)} />)}</div>
+          </section>
+          <h2 className="group-title" style={{ margin: 0 }}>Podle předmětů</h2>
+          <div className="auto-cols">
+            {subjects.map((s) => {
+              const sorted = [...s.marks].sort((a, b) => b.date.localeCompare(a.date));
+              return (
+                <section key={s.id} style={{ ["--hue" as string]: `var(--h-${hueFor(s.name)})` }}>
+                  <div className="subject-head">
+                    <h3>
+                      <span className="dot" />
+                      {s.name}
+                      {s.temporary && (
+                        <span className="temp-mark" title={s.temporaryNote ? `Předběžná známka: ${s.temporaryNote}` : "Předběžná (čtvrtletní) známka"}>
+                          <span className={`mark${tempGrade(s.temporary)}`}>{s.temporary}</span>
+                          <small>{s.temporaryNote || "čtvrtletí"}</small>
+                        </span>
+                      )}
+                    </h3>
+                    {s.averageText && <span className="avg">průměr<b>{s.averageText}</b></span>}
+                  </div>
+                  <div className="card rows">
+                    {sorted.slice(0, 3).map((m) => <MarkRow key={m.id} m={m} />)}
+                    {sorted.length > 3 && (
+                      <details className="more-rows">
+                        <summary>Další známky ({sorted.length - 3})</summary>
+                        {sorted.slice(3).map((m) => <MarkRow key={m.id} m={m} />)}
+                      </details>
+                    )}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

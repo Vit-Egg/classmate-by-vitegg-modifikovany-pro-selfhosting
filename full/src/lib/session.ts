@@ -63,6 +63,14 @@ export async function createSession(userId: number) {
   (await cookies()).set(COOKIE, token, { httpOnly: true, sameSite: "lax", secure: secure(), path: "/", maxAge: TTL / 1000 });
 }
 
+/** Relace pro rám v Classmate (cookie se nastavuje jako dělená, viz /classmate/session). Vrací token a dobu platnosti v sekundách. */
+export function newFrameSession(userId: number, ua: string | null) {
+  const token = randomToken(32);
+  const now = Date.now();
+  run("INSERT INTO sessions (id, user_id, created_at, last_seen, expires_at, user_agent) VALUES (?, ?, ?, ?, ?, ?)", sha256(token), userId, now, now, now + TTL, ua ? `${ua.slice(0, 180)} (Classmate)` : "Classmate");
+  return { token, maxAge: TTL / 1000, cookie: COOKIE };
+}
+
 export async function destroySession() {
   const jar = await cookies();
   const token = jar.get(COOKIE)?.value;

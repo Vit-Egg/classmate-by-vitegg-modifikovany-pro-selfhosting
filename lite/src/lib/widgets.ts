@@ -4,7 +4,13 @@ import { peek, ttKey, weekStart, type KomensMessage } from "./bk";
 import { ME } from "./db";
 import { isLunch, stravaAccount, stravaMenu } from "./strava";
 import { absenceHours, type AbsenceData, type MarksData, type Timetable } from "./types";
-import type { EDay, RenderInput } from "./embed/core";
+import type { EDay, RenderInput } from "./embed/types";
+
+const HUES = ["gray", "purple", "green", "amber", "blue"];
+/** Barva předmětu podle názvu (stejně jako ve starém Classmate). */
+export const hueFor = (name: string) => HUES[[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % HUES.length];
+/** Mapa id předmětu → barva pro rozvrh. */
+export const huesOf = (tt: Timetable) => new Map(tt.lessons.filter((l) => l.subjectId).map((l) => [l.subjectId, hueFor(l.subject)]));
 
 export const LITE_WIDGETS = ["rozvrh", "suplovani", "znamky", "prumery", "absence", "komens", "obedy"];
 
@@ -17,7 +23,7 @@ export function dayLessons(tt: Timetable, dow: number) {
     const cancelled = l.change?.kind === "cancelled";
     const prev = byHour.get(l.hour);
     if (prev && !prev.cancelled) continue;
-    byHour.set(l.hour, { hour: l.hour, subject: l.subject, begin: h?.begin ?? "", end: h?.end ?? "", room: l.room || undefined, teacher: l.teacherName || l.teacher || undefined, cancelled, change: l.change ? [l.change.label, l.change.text].filter(Boolean).join(" · ") : null });
+    byHour.set(l.hour, { hour: l.hour, subject: l.subject, hue: hueFor(l.subject), begin: h?.begin ?? "", end: h?.end ?? "", room: l.room || undefined, teacher: l.teacherName || l.teacher || undefined, cancelled, change: l.change ? [l.change.label, l.change.text].filter(Boolean).join(" · ") : null });
   }
   return [...byHour.values()];
 }
@@ -62,7 +68,7 @@ export async function widgetData(id: string): Promise<RenderInput | null> {
     case "znamky": {
       const m = peek<MarksData>("marks")?.data;
       const list = (m?.subjects ?? [])
-        .flatMap((s) => s.marks.map((x) => ({ subject: s.name, value: x.text || (x.value == null ? "" : String(x.value)), caption: x.caption || x.theme, weight: x.weight, date: x.date, isNew: x.isNew })))
+        .flatMap((s) => s.marks.map((x) => ({ subject: s.name, hue: hueFor(s.name), value: x.text || (x.value == null ? "" : String(x.value)), caption: x.caption || x.theme, weight: x.weight, date: x.date, isNew: x.isNew })))
         .filter((x) => x.value)
         .sort((a, b) => b.date.localeCompare(a.date));
       return { id, marks: list };

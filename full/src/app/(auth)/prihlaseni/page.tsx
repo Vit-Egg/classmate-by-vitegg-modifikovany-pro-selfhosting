@@ -5,6 +5,7 @@ import { ActionForm, Submit } from "@/components/forms";
 import { mailConfigured } from "@/lib/mail";
 import { getCurrentUser } from "@/lib/session";
 import { needsSetup } from "@/lib/setup";
+import { CmLogin } from "@/components/CmLogin";
 
 export const metadata = { title: "Přihlášení" };
 
@@ -16,6 +17,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   if (await getCurrentUser()) redirect(safe || "/dnes");
   return (
     <>
+      {/* v rámu Classmate: přihlášení v novém okně (cookie z formuláře v rámu by prohlížeč zahodil) */}
+      <CmLogin name="Classmate" />
+      <div className="cm-login-form">
       <h1>Vítej zpět</h1>
       {sp.reset && <p className="msg-ok" role="status">Heslo je změněné. Přihlas se novým heslem.</p>}
       <ActionForm action={loginAction} resetOnSuccess={false}>
@@ -32,6 +36,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <Submit className="btn primary big">Přihlásit se</Submit>
       </ActionForm>
       {mailConfigured() && <p className="alt" style={{ marginTop: 14 }}><Link href="/zapomenute-heslo">Zapomněl(a) jsi heslo?</Link></p>}
+      </div>
     </>
   );
 }

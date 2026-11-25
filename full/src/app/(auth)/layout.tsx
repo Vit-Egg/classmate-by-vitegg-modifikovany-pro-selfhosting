@@ -9,7 +9,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="auth">
       <ClearOfflinePages />
       <AppBridge signedIn={false} />
-      <aside className="auth-hero">
+      <aside className="auth-hero cm-hide">
         <div>
           <Link href="/" className="brand-name" aria-label="Zpět na úvodní stránku">Classmate</Link>
         </div>

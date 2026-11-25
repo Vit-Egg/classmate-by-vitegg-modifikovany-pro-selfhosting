@@ -10,7 +10,8 @@ Dvě varianty:
 | Obědy ze Strava.cz (jídelníček, kredit, objednávky) | ✓ | ✓ |
 | Úkoly, testy a zkoušení, poznámky, kalendář, předměty | ✓ | – |
 | Studium s AI, Todoist, MCP server, trofeje | ✓ | – |
-| Widgety a plugin pro nový Classmate | ✓ (9 widgetů) | ✓ (7 widgetů) |
+| Plugin pro nový Classmate (stránky do menu, widgety, rozvržení) | ✓ (9 stránek, 9 widgetů) | ✓ (5 stránek, 7 widgetů) |
+| Vzhled starého Classmate | ✓ | ✓ |
 | Kalendář ICS se suplováním | ✓ | ✓ |
 | Upozornění | web push, e-mail | ntfy |
 | Účty | jeden | jeden (jen heslo) |
@@ -18,19 +19,16 @@ Dvě varianty:
 
 Obě varianty jsou bez registrace, spolužáků, nástěnky třídy, služeb a pokladny.
 
-## Widgety v novém Classmate
+## Propojení s novým Classmate
 
-Obě varianty mají stránku **Widgety** s adresou pluginu ve formátu `classmate-plugin/1`:
+V Classmate otevři **Nastavení → Pluginy a weby → Přidat web** a zadej jen adresu svého serveru (třeba `https://bakalari.muj-server.cz`). Žádné klíče se nekopírují.
 
-```
-https://<tvůj-server>/embed/widgets.json?k=<tajný klíč>
-```
+- Classmate si sám najde, co server nabízí (`/.well-known/classmate.json`): **stránky do menu** (Rozvrh z Bakalářů, Známky, Absence, Komens, Obědy, u plné verze i Úkoly, Testy, Poznámky a Studium), **widgety na Dnes** a rozvržení **„Klasický Classmate“**.
+- Stránky a widgety se zobrazují ve vzhledu Classmate (stejná písma, barvy, světlý i tmavý motiv), takže vypadají jako jeho součást.
+- Když je potřeba přihlášení, ukáže se tlačítko a otevře **okno s přihlášením**. Server pak rámu v Classmate dá vlastní přihlášení v dělené cookie, která platí jen pro vložení v Classmate.
+- Do `.env` přidej `EMBED_ORIGINS=https://classmate.cz` (adresa tvého Classmate), jinak prohlížeč vložení nedovolí.
 
-V Classmate ji vložíš do **Nastavení → Pluginy → Přidat plugin z adresy** a použiješ rozvržení **„Klasický Classmate“**, které poskládá nástěnku jako ve starém Classmate. Nebo bez kopírování přes `/classmate/connect?origin=<adresa Classmate>`.
-
-Do `.env` přidej `EMBED_ORIGINS=https://classmate.cz` (adresa tvého Classmate), jinak prohlížeč vložení nedovolí.
-
-Widgety jsou čisté HTML bez JavaScriptu, ladí se parametry `&theme=light|dark` a `&bg=transparent` a čtou jen data uložená na serveru. Kód je v obou variantách stejný: `src/lib/embed/core.ts`.
+Chceš udělat vlastní plugin (jen widgety, nebo víc položek do menu)? Návod je v **[PLUGINY.md](PLUGINY.md)**.
 
 ## Rychlý start
 

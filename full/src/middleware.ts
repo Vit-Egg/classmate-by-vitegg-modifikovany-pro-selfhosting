@@ -13,18 +13,26 @@ import { buildCsp } from "@/lib/csp";
  */
 const EXEMPT = [/^\/api\/pokladna\/stripe\//, /^\/oauth\/(token|register|revoke)$/, /^\/mcp$/, /^\/api\/v1(\/|$)/];
 
-/** Když je zapnutá vlastní statistika, hlavička CSP se skládá za běhu z .env (adresa Umami není v době sestavení obrazu známá). */
-function next() {
+/** Kdo smí aplikaci vložit do rámu: tento server a domény z EMBED_ORIGINS (nový Classmate s pluginem). Okno s přihlášením pro Classmate nikdo. */
+function frameAncestors(path: string) {
+  if (path.startsWith("/classmate/login")) return "'none'";
+  const origins = (process.env.EMBED_ORIGINS ?? "").split(/[,\s]+/).map((s) => s.trim().replace(/\/+$/, "")).filter((s) => /^https?:\/\/[a-z0-9.-]+(:\d+)?$/i.test(s));
+  return ["'self'", ...origins].join(" ");
+}
+
+/** CSP se skládá za běhu: adresa statistiky (Umami) i adresy Classmate (EMBED_ORIGINS) nejsou v době sestavení obrazu známé. V dev režimu jen frame-ancestors. */
+function next(req: NextRequest) {
   const res = NextResponse.next();
-  const a = process.env.NODE_ENV === "production" ? analyticsConfig() : null;
-  if (a) res.headers.set("Content-Security-Policy", buildCsp(a.origin));
+  const fa = frameAncestors(req.nextUrl.pathname);
+  if (process.env.NODE_ENV === "production") res.headers.set("Content-Security-Policy", buildCsp(analyticsConfig()?.origin, fa));
+  else res.headers.set("Content-Security-Policy", `frame-ancestors ${fa}`);
   return res;
 }
 
 export function middleware(req: NextRequest) {
-  if (["GET", "HEAD", "OPTIONS"].includes(req.method) || EXEMPT.some((r) => r.test(req.nextUrl.pathname))) return next();
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method) || EXEMPT.some((r) => r.test(req.nextUrl.pathname))) return next(req);
   if (crossSite(req.headers)) return new NextResponse("Forbidden", { status: 403 });
-  return next();
+  return next(req);
 }
 
 export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|sw.js|poznamky/\\d+/(?:audio|priloha|obrazek)$).*)"] };

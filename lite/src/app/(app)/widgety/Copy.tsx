@@ -5,8 +5,8 @@ import { useState } from "react";
 export function Copy({ value }: { value: string }) {
   const [done, setDone] = useState(false);
   return (
-    <div className="row" style={{ flexWrap: "nowrap" }}>
-      <input readOnly value={value} onFocus={(e) => e.currentTarget.select()} aria-label="Adresa" style={{ fontSize: 13 }} />
+    <div className="btn-row" style={{ flexWrap: "nowrap" }}>
+      <input className="input" readOnly value={value} onFocus={(e) => e.currentTarget.select()} aria-label="Adresa" style={{ fontSize: 13 }} />
       <button
         type="button"
         className="btn small"

@@ -20,15 +20,16 @@ Bez Dockeru: `npm install && npm run build && npm start` (Node 22+).
 2. **Nastavení → Propojení:** přihlas se do Bakalářů, propoj Strava.cz (číslo jídelny, volitelně jméno a heslo pro objednávání) a případně Todoist.
 3. **Správa:** klíče pro AI (Gemini), pošta, stav serveru, audit log.
 
-## Widgety pro nový Classmate
+## Propojení s novým Classmate
 
-Stránka **Widgety** (v menu) ukáže adresu pluginu `/embed/widgets.json?k=…`. V novém Classmate: **Nastavení → Pluginy → Přidat plugin z adresy**. Nabídne rozvržení „Klasický Classmate“.
+V novém Classmate: **Nastavení → Pluginy a weby → Přidat web** a zadej adresu tohoto serveru. Classmate najde `/.well-known/classmate.json` a nabídne stránky do menu (Rozvrh z Bakalářů, Známky, Absence, Komens, Obědy, Moje úkoly, Moje testy, Moje poznámky, Studium), widgety na Dnes (`rozvrh`, `suplovani`, `znamky`, `prumery`, `absence`, `komens`, `obedy`, `ukoly`, `testy`) a rozvržení „Klasický Classmate“.
 
-Widgety: `rozvrh`, `suplovani`, `znamky`, `prumery`, `absence`, `komens`, `obedy`, `ukoly`, `testy` na adrese `/embed/<widget>?k=…`, parametry `&theme=light|dark` a `&bg=transparent`. Propojení bez kopírování adres: `/classmate/connect?origin=<adresa Classmate>` (po přihlášení a potvrzení se adresa pošle přes `postMessage`).
+- V rámu Classmate se schová vlastní menu a převezme se motiv a barva, stránky tak vypadají jako součást Classmate.
+- Přihlášení: tlačítko v rámu otevře okno s přihlášením (i s 2FA), rám pak dostane vlastní relaci v dělené cookie. Žádné klíče v adresách.
+- Vložit smí jen tento server a domény z `EMBED_ORIGINS`. Okno s přihlášením se vkládat nesmí.
+- Záloha pro jiné dashboardy: widgety s tajným klíčem `?k=…` na stránce Widgety. Kód: `src/lib/embed/`, `src/app/embed/`, `src/app/classmate/`.
 
-- Klíč `k` otevře jen widgety a manifest. Vyměníš ho na stránce Widgety.
-- Vložit widgety smí jen tento server a domény z `EMBED_ORIGINS` (`frame-ancestors`), manifest dostanou přes CORS taky jen ony.
-- Widgety čtou jen z paměti serveru, Bakaláře kvůli nim nevolají. Kód: `src/lib/embed/`, `src/app/embed/`.
+Jak udělat vlastní plugin: [PLUGINY.md](../PLUGINY.md).
 
 ## Upozornění
 

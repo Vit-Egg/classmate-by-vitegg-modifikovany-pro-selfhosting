@@ -1,0 +1,43 @@
+/* ---------- plugin pro Classmate: widgety a vzhled v rámu (stejné v plné i odlehčené verzi) ---------- */
+.tag.accent { color: var(--accent); }
+.cmw { padding: 0; }
+.cmw-title { padding: 0 4px; margin: 0 0 12px; }
+.cmw-card { padding: 6px 0; overflow: hidden; }
+.cmw-empty { color: var(--muted); padding: 14px 20px; }
+.cmw-day + .cmw-day { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 4px; }
+.cmw-dayname { font-weight: 700; font-size: 13px; color: var(--muted); padding: 10px 20px 4px; }
+.cmw-row { display: flex; align-items: center; gap: 12px; padding: 9px 20px; min-height: 46px; }
+.cmw-row + .cmw-row { border-top: 1px solid var(--border); }
+.cmw-lesson { box-shadow: inset 3px 0 0 var(--hue, var(--h-gray)); }
+.cmw-num { width: 22px; flex: none; color: var(--muted); font-variant-numeric: tabular-nums; font-weight: 600; text-align: center; }
+.cmw-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.cmw-main b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmw-main small { color: var(--muted); font-size: 12.5px; }
+.is-off .cmw-main b { text-decoration: line-through; color: var(--muted); }
+.is-unread .cmw-main b { font-weight: 800; }
+.is-ordered .cmw-main span { font-weight: 700; }
+.cmw-mark { width: 38px; height: 38px; flex: none; border-radius: 12px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 18px; background: var(--surface-2); }
+.cmw-mark.is-new { background: var(--accent-soft); color: var(--accent); }
+.cmw-avg { font-family: var(--font-display); font-weight: 800; font-size: 20px; }
+.cmw-avg.is-bad, .cmw-pct.is-bad, b.is-bad { color: var(--danger); }
+.cmw-pct { font-size: 13px; color: var(--muted); font-weight: 600; }
+.cmw-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 10px 14px; }
+.cmw-stats > div { background: var(--surface-2); border-radius: 14px; padding: 10px 12px; }
+.cmw-stats b { display: block; font-family: var(--font-display); font-size: 22px; font-weight: 800; }
+.cmw-stats small { color: var(--muted); font-size: 12px; }
+.cmw-bar { display: block; height: 5px; border-radius: 3px; background: var(--surface-2); overflow: hidden; margin-top: 5px; }
+.cmw-bar i { display: block; height: 100%; background: var(--accent); }
+.cmw-bar i.is-bad { background: var(--danger); }
+.embed-page { padding: 12px; }
+.cm-login { display: none; }
+
+/* v rámu Classmate: bez vlastního menu a pozadí, nadpis widgetu kreslí Classmate */
+html.in-cm, html.in-cm body { background: transparent; }
+html.in-cm .sidebar, html.in-cm .cm-hide { display: none !important; }
+html.in-cm .shell { display: block; min-height: 0; }
+html.in-cm .main { padding: 2px 2px 32px; max-width: none; }
+html.in-cm .embed-page { padding: 0; }
+html.in-cm .cmw-title { display: none; }
+html.in-cm .cmw-card { box-shadow: none; }
+html.in-cm .cm-login { display: block; }
+html.in-cm .cm-login-form { display: none; }

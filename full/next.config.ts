@@ -48,7 +48,6 @@ const config: NextConfig = {
   async headers() {
     const common = [
       { key: "X-Content-Type-Options", value: "nosniff" },
-      { key: "X-Frame-Options", value: "DENY" },
       { key: "Referrer-Policy", value: "same-origin" },
       { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
       { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
@@ -57,12 +56,11 @@ const config: NextConfig = {
     const strict = prod
       ? [
           { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
-          { key: "Content-Security-Policy", value: csp },
         ]
       : [];
     return [
-      // widgety (/embed) a propojení (/classmate/connect) si hlavičky pro vložení nastavují samy
-      { source: "/((?!embed/|classmate/connect).*)", headers: [...common, ...strict] },
+      // CSP včetně frame-ancestors (kdo smí aplikaci vložit, EMBED_ORIGINS) skládá za běhu src/middleware.ts
+      { source: "/:path*", headers: [...common, ...strict] },
       // server je soukromý, nic z něj nepatří do vyhledávačů (kromě meta značky i hlavičkou)
       { source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
       // ikony, favicon a náhledový obrázek se mění zřídka: prohlížeč je nemusí při každém načtení znovu ověřovat

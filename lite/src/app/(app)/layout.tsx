@@ -1,13 +1,15 @@
 import { requireLogin } from "@/lib/auth";
-import { Nav } from "./Nav";
+import { bkInfo } from "@/lib/bk";
+import { Sidebar } from "@/components/Sidebar";
 
 export const dynamic = "force-dynamic";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   await requireLogin();
+  const info = bkInfo();
   return (
     <div className="shell">
-      <Nav />
+      <Sidebar name={info.name ?? ""} cls={info.cls ?? ""} />
       <main className="main">{children}</main>
     </div>
   );

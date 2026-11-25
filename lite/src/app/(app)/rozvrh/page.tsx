@@ -1,89 +1,44 @@
 import Link from "next/link";
-import { peek, timetable, ttKey, weekStart } from "@/lib/bk";
-import { addDays, pragueNow } from "@/lib/dates";
+import { TimetableView } from "@/components/Timetable";
+import { peek, permanent, timetable, ttKey, weekStart } from "@/lib/bk";
+import { addDays, fmtShort, pragueNow } from "@/lib/dates";
 import type { Timetable } from "@/lib/types";
-import { dayLessons } from "@/lib/widgets";
-import { Flash, SyncButton, type SP } from "../ui";
+import { huesOf } from "@/lib/widgets";
+import { Flash, Head, SyncButton, type SP } from "../ui";
 
 export const metadata = { title: "Rozvrh" };
 
-const DAYS = ["Po", "Út", "St", "Čt", "Pá"];
-const d = (iso: string) => `${Number(iso.slice(8, 10))}. ${Number(iso.slice(5, 7))}.`;
+const TABS = [
+  { key: "this", param: "tento", label: "Tento týden" },
+  { key: "next", param: "pristi", label: "Příští týden" },
+  { key: "permanent", param: "staly", label: "Stálý rozvrh" },
+] as const;
 
 export default async function TimetablePage({ searchParams }: { searchParams: SP }) {
   const sp = await searchParams;
-  const which = sp.w === "next" ? "next" : "this";
-  const monday = weekStart(which);
-  // aktuální týden se smí dočíst z Bakalářů (cache 10 min), jiný jen z paměti
-  const tt = (await timetable(monday)) ?? peek<Timetable>(ttKey(monday))?.data ?? null;
-  const today = pragueNow().date;
-  const hours = tt?.hours.filter((h) => tt.lessons.some((l) => l.hour === h.hour)) ?? [];
+  const tab = TABS.find((t) => t.param === sp.t) ?? TABS[0];
+  const now = pragueNow();
+  const monday = tab.key === "permanent" ? undefined : weekStart(tab.key);
+  // tento týden se smí dočíst z Bakalářů (cache 10 min), ostatní jen z paměti, kterou plní synchronizace na pozadí
+  const tt: Timetable | null = tab.key === "permanent" ? await permanent() : tab.key === "this" ? await timetable(monday!) : peek<Timetable>(ttKey(monday!))?.data ?? (await timetable(monday!));
   return (
-    <>
-      <div className="head">
-        <div>
-          <h1>Rozvrh</h1>
-          <p className="sub">Týden od {d(monday)} · zrušené hodiny přeškrtnuté, změny zvýrazněné</p>
-        </div>
-        <SyncButton back={`/rozvrh${which === "next" ? "?w=next" : ""}`} />
-      </div>
+    <div className="wide">
+      <Head title="Rozvrh" sub={tab.key === "permanent" ? "Základní rozvrh bez změn a suplování." : `Aktuální rozvrh z Bakalářů včetně změn · ${fmtShort(monday!)} – ${fmtShort(addDays(monday!, 4))}`}>
+        <SyncButton back={`/rozvrh?t=${tab.param}`} />
+      </Head>
       <Flash sp={sp} />
-      <div className="row" style={{ marginBottom: 14 }}>
-        <Link className="btn small" href="/rozvrh" aria-current={which === "this" ? "page" : undefined} style={which === "this" ? { fontWeight: 600 } : undefined}>Tento týden</Link>
-        <Link className="btn small" href="/rozvrh?w=next" style={which === "next" ? { fontWeight: 600 } : undefined}>Příští týden</Link>
+      <div className="toolbar">
+        <nav className="seg" aria-label="Období">
+          {TABS.map((t) => (
+            <Link key={t.key} href={`/rozvrh?t=${t.param}`} aria-current={t.key === tab.key}>{t.label}</Link>
+          ))}
+        </nav>
       </div>
-      {!tt ? (
-        <div className="card">Rozvrh zatím není načtený. Propoj Bakaláře v Nastavení.</div>
+      {tt ? (
+        <TimetableView tt={tt} monday={monday} today={now.date} todayDow={now.dow} vertical={false} hues={huesOf(tt)} permanent={tab.key === "permanent"} />
       ) : (
-        <div className="card tt">
-          <table>
-            <thead>
-              <tr>
-                <th style={{ width: 70 }} />
-                {hours.map((h) => (
-                  <th key={h.hour}>
-                    {h.hour}. <span className="mut">{h.begin}</span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {DAYS.map((name, i) => {
-                const date = addDays(monday, i);
-                const lessons = dayLessons(tt, i + 1);
-                const note = tt.days.find((x) => x.day === i + 1)?.description;
-                return (
-                  <tr key={name} style={date === today ? { background: "color-mix(in srgb, var(--acc) 7%, transparent)" } : undefined}>
-                    <th>
-                      {name}
-                      <br />
-                      <span className="mut">{d(date)}</span>
-                    </th>
-                    {note && !lessons.length ? (
-                      <td colSpan={hours.length} className="mut">{note}</td>
-                    ) : (
-                      hours.map((h) => {
-                        const l = lessons.find((x) => x.hour === h.hour);
-                        return (
-                          <td key={h.hour} className={[l?.cancelled ? "x" : "", l?.change ? "chg" : ""].join(" ")}>
-                            {l && (
-                              <>
-                                <b>{l.subject || "—"}</b>
-                                <span className="mut">{[l.room, l.teacher].filter(Boolean).join(" · ")}</span>
-                                {l.change && <div className="c">{l.change}</div>}
-                              </>
-                            )}
-                          </td>
-                        );
-                      })
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <div className="empty">Rozvrh zatím není načtený. Propoj Bakaláře v <Link href="/nastaveni" className="link-u">Nastavení</Link>.</div>
       )}
-    </>
+    </div>
   );
 }
