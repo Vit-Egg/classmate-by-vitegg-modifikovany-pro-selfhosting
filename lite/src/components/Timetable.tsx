@@ -210,7 +210,7 @@ export function TimetableView({ tt, monday, today, todayDow, vertical, hues, per
     />
     <div className="tt-wrap tt-desktop">
       {vertical ? (
-        <div className="tt v" style={{ gridTemplateColumns: `90px repeat(${rowsCount}, minmax(116px, 1fr))`, minWidth: 90 + rowsCount * 118 }}>
+        <div className="tt v" style={{ gridTemplateColumns: `90px repeat(${rowsCount}, minmax(84px, 1fr))`, minWidth: 90 + rowsCount * 86 }}>
           <div style={{ gridRow: 1, gridColumn: 1 }} />
           {hours.map((h, i) => (
             <div key={h.hour} className="tt-head" style={{ padding: "8px 0", gridRow: 1, gridColumn: i + 2 }}>

@@ -41,3 +41,7 @@ html.in-cm .cmw-title { display: none; }
 html.in-cm .cmw-card { box-shadow: none; }
 html.in-cm .cm-login { display: block; }
 html.in-cm .cm-login-form { display: none; }
+/* rám se zvětšuje podle obsahu (cm-autoh): stránka v rámu nemá vlastní posuvníky ani přesah do stran */
+html.in-cm.cm-autoh, html.in-cm.cm-autoh body { overflow: hidden; height: auto; min-height: 0; }
+html.in-cm .tt-wrap { margin: 0; padding: 0 0 8px; }
+html.in-cm .main { padding-bottom: 8px; }

@@ -37,4 +37,4 @@ export function Head({ title, sub, children }: { title: string; sub?: string; ch
   );
 }
 
-export type SP = Promise<{ e?: string; ok?: string; w?: string; t?: string }>;
+export type SP = Promise<{ e?: string; ok?: string; w?: string; t?: string; o?: string }>;
