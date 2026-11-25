@@ -45,7 +45,7 @@ export function CmLogin({ always = false, name = "tomuhle serveru" }: { always?:
 export function CmLoginDone({ token }: { token: string }) {
   const [msg, setMsg] = useState("Předávám přihlášení…");
   useEffect(() => {
-    if (!window.opener) return setMsg("Přihlášení je hotové. Tohle okno otevři tlačítkem Přihlásit se v Classmate.");
+    if (!window.opener) return setMsg("Přihlášení je hotové, ale okno ztratilo spojení s Classmate (třeba po přihlášení přes Cloudflare). Zavři ho a v Classmate klikni na Přihlásit se ještě jednou.");
     window.opener.postMessage({ type: "classmate-login", token }, location.origin);
     setMsg("Hotovo, okno se zavře.");
     const t = setTimeout(() => window.close(), 600);
